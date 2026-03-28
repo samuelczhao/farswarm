@@ -168,11 +168,11 @@ class TestArchetypeClusterer:
     def test_cluster_caps_at_n_samples(
         self, text_response: NeuralResponse, atlas: BrainAtlas,
     ) -> None:
-        """Requesting more archetypes than timesteps caps at n_timesteps."""
+        """Requesting more archetypes than population caps at population size."""
         compressed, activations = self._get_compressed_and_activations(text_response)
-        clusterer = ArchetypeClusterer(n_archetypes=200)
+        clusterer = ArchetypeClusterer(n_archetypes=500)
         archetypes = clusterer.cluster(compressed, atlas, activations)
-        assert len(archetypes) <= text_response.n_timesteps
+        assert len(archetypes) <= 200  # default population size
 
     def test_archetype_fields(
         self, text_response: NeuralResponse, atlas: BrainAtlas,
@@ -199,14 +199,16 @@ class TestArchetypeClusterer:
         total = sum(a.population_fraction for a in archetypes)
         assert total == pytest.approx(1.0, abs=1e-6)
 
-    def test_centroid_shape_matches_compressed_dims(
+    def test_centroid_shape_matches_n_regions(
         self, text_response: NeuralResponse, atlas: BrainAtlas,
     ) -> None:
+        """Centroids should have one dimension per brain region."""
         compressed, activations = self._get_compressed_and_activations(text_response)
         clusterer = ArchetypeClusterer(n_archetypes=4)
         archetypes = clusterer.cluster(compressed, atlas, activations)
+        n_regions = len(atlas.REGIONS)
         for arch in archetypes:
-            assert arch.centroid.shape == (compressed.shape[1],)
+            assert arch.centroid.shape == (n_regions,)
 
 
 # --- EngagementTemplateBuilder ---

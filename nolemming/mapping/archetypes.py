@@ -1,4 +1,4 @@
-"""Clustering compressed neural responses into behavioral archetypes."""
+"""Clustering a neural population into behavioral archetypes."""
 
 from __future__ import annotations
 
@@ -41,10 +41,30 @@ REGION_LABEL_PREFIX: dict[str, str] = {
 
 
 class ArchetypeClusterer:
-    """Groups compressed neural responses into distinct behavioral archetypes."""
+    """Groups a neural population into distinct behavioral archetypes."""
 
     def __init__(self, n_archetypes: int = 8) -> None:
         self.n_archetypes = n_archetypes
+
+    def cluster_population(
+        self,
+        population: NDArray[np.float32],
+        atlas: BrainAtlas,
+    ) -> list[NeuralArchetype]:
+        """Cluster a population matrix (n_individuals, n_regions) into archetypes.
+
+        This is the primary method. Each row is one individual's ROI profile.
+        """
+        effective_k = min(self.n_archetypes, population.shape[0])
+        kmeans = KMeans(n_clusters=effective_k, n_init=10, random_state=42)
+        labels = kmeans.fit_predict(population)
+        region_names = list(atlas.REGIONS.keys())
+        return [
+            self._build_from_population(
+                i, kmeans, labels, population, region_names,
+            )
+            for i in range(effective_k)
+        ]
 
     def cluster(
         self,
@@ -52,31 +72,36 @@ class ArchetypeClusterer:
         atlas: BrainAtlas,
         original_activations: NDArray[np.float32],
     ) -> list[NeuralArchetype]:
-        """Cluster compressed vectors and map back to brain regions."""
-        effective_k = min(self.n_archetypes, compressed_timesteps.shape[0])
-        kmeans = KMeans(n_clusters=effective_k, n_init=10, random_state=42)
-        labels = kmeans.fit_predict(compressed_timesteps)
-        return [
-            self._build_archetype(i, kmeans, labels, atlas, original_activations)
-            for i in range(effective_k)
-        ]
+        """Legacy method: cluster compressed timesteps.
 
-    def _build_archetype(
+        Prefer cluster_population() for better archetype diversity.
+        Falls back to population-based clustering using the original
+        activations' ROI profiles.
+        """
+        from nolemming.core.types import NeuralResponse
+        from nolemming.mapping.population import generate_population_responses
+
+        response = NeuralResponse(activations=original_activations)
+        population = generate_population_responses(response, atlas)
+        return self.cluster_population(population, atlas)
+
+    def _build_from_population(
         self,
         cluster_idx: int,
         kmeans: KMeans,
         labels: NDArray[np.int32],
-        atlas: BrainAtlas,
-        original_activations: NDArray[np.float32],
+        population: NDArray[np.float32],
+        region_names: list[str],
     ) -> NeuralArchetype:
-        """Construct a single NeuralArchetype from cluster results."""
+        """Build archetype from population cluster."""
         mask = labels == cluster_idx
         pop_fraction = float(np.sum(mask)) / len(labels)
-        cluster_mean = np.mean(original_activations[mask], axis=0)
-        dominant = atlas.get_dominant_regions(cluster_mean.astype(np.float32))
+        centroid = kmeans.cluster_centers_[cluster_idx]
+
+        dominant = _dominant_regions_from_centroid(centroid, region_names)
         return NeuralArchetype(
             archetype_id=cluster_idx,
-            centroid=kmeans.cluster_centers_[cluster_idx].astype(np.float32),
+            centroid=centroid.astype(np.float32),
             label=_make_label(dominant),
             description=_make_description(dominant),
             population_fraction=pop_fraction,
@@ -84,8 +109,17 @@ class ArchetypeClusterer:
         )
 
 
+def _dominant_regions_from_centroid(
+    centroid: NDArray[np.float32],
+    region_names: list[str],
+    top_k: int = 3,
+) -> list[str]:
+    """Find the top-k regions by centroid value."""
+    indices = np.argsort(centroid)[::-1][:top_k]
+    return [region_names[i] for i in indices if i < len(region_names)]
+
+
 def _make_label(dominant_regions: list[str]) -> str:
-    """Generate a short label from the top dominant region."""
     if not dominant_regions:
         return "mixed-profile"
     top = dominant_regions[0]
@@ -93,7 +127,6 @@ def _make_label(dominant_regions: list[str]) -> str:
 
 
 def _make_description(dominant_regions: list[str]) -> str:
-    """Generate a behavioral description from dominant brain regions."""
     traits = [
         REGION_BEHAVIOR[r] for r in dominant_regions if r in REGION_BEHAVIOR
     ]
