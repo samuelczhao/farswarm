@@ -1,0 +1,20 @@
+{
+  "event_id": "meta_q4_2025",
+  "name": "Meta Platforms Q4 2025 Earnings",
+  "date": "2026-01-28",
+  "stimulus_path": "stimuli/meta_q4_2025.txt",
+  "beat_or_miss": "beat",
+  "eps_actual": 8.88,
+  "eps_estimated": 8.19,
+  "revenue_actual_b": 59.9,
+  "revenue_estimated_b": 58.4,
+  "stock_reaction_pct": 10.5,
+  "actual_sentiment": {
+    "timestamps": [0.0, 4.0, 8.0, 12.0, 24.0, 48.0, 72.0],
+    "scores": [0.0, 0.50, 0.40, 0.35, 0.30, 0.25, 0.20],
+    "volumes": [60, 1200, 2500, 3000, 1800, 900, 400]
+  },
+  "actual_keywords": ["AI", "spending", "capex", "advertising", "beat", "superintelligence", "Zuckerberg", "growth", "metaverse", "strong"],
+  "actual_engagement_volumes": [60, 1200, 2500, 3000, 1800, 900, 400],
+  "dominant_narrative": "Strong earnings beat overshadowed by massive $115-135B CapEx guidance for AI. Zuckerberg frames as superintelligence race. Initial euphoria fades as spending concerns grow."
+}

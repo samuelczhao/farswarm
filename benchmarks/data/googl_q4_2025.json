@@ -1,0 +1,20 @@
+{
+  "event_id": "googl_q4_2025",
+  "name": "Alphabet Q4 2025 Earnings",
+  "date": "2026-02-04",
+  "stimulus_path": "stimuli/googl_q4_2025.txt",
+  "beat_or_miss": "beat",
+  "eps_actual": 2.82,
+  "eps_estimated": 2.63,
+  "revenue_actual_b": 113.83,
+  "revenue_estimated_b": 111.43,
+  "stock_reaction_pct": -7.0,
+  "actual_sentiment": {
+    "timestamps": [0.0, 4.0, 8.0, 12.0, 24.0, 48.0, 72.0],
+    "scores": [0.0, 0.20, -0.05, -0.15, -0.20, -0.15, -0.10],
+    "volumes": [70, 1000, 2000, 2800, 1600, 800, 400]
+  },
+  "actual_keywords": ["cloud", "advertising", "beat", "capex", "spending", "YouTube", "miss", "AI", "search", "competition"],
+  "actual_engagement_volumes": [70, 1000, 2000, 2800, 1600, 800, 400],
+  "dominant_narrative": "Revenue and EPS beat but stock dropped 7%. YouTube ads slightly missed. Cloud growth strong. Massive $175-185B CapEx guidance spooked investors. 'Beat but sell' dynamic."
+}

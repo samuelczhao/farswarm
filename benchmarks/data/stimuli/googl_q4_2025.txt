@@ -1,0 +1,17 @@
+Alphabet Inc. Q4 2025 Earnings Call Summary (February 4, 2026)
+
+Alphabet reported Q4 2025 revenue of $113.83 billion, beating analyst estimates of $111.43 billion. Earnings per share of $2.82 exceeded the $2.63 consensus. Revenue grew 18% year-over-year, and net income surged 30%.
+
+Despite the beat on all major metrics, the stock dropped approximately 7% in after-hours trading in a classic "beat and sell" reaction. The primary catalyst for the selloff was the company's 2026 capital expenditure guidance of $175 billion to $185 billion, a massive increase that exceeded even the most aggressive analyst estimates.
+
+CEO Sundar Pichai opened by highlighting Google Cloud's strong performance, with revenue reaching $17.66 billion versus the $16.18 billion estimate. Cloud growth was driven by AI workloads, with enterprises rapidly adopting Google's Gemini AI models and Vertex AI platform.
+
+Core advertising revenue grew 13.5% to $82.28 billion, showing the resilience of Google's search business despite growing competition from AI-powered alternatives. However, YouTube advertising revenue of $11.38 billion slightly missed the $11.84 billion estimate, partly due to a tough year-over-year comparison with the 2024 election cycle.
+
+CFO Anat Ashkenazi detailed the CapEx plans, explaining that the spending would fund new data centers, AI accelerators, and network infrastructure. She characterized it as "investing at the pace of opportunity" but acknowledged the spending would pressure free cash flow in the near term.
+
+During the Q&A, analysts expressed concern about the ROI timeline on the massive infrastructure investment. Several drew comparisons to the "AI arms race" spending by Meta and Microsoft, questioning whether the industry was overbuilding capacity. Pichai pushed back, arguing that every indication suggested AI demand would continue to accelerate.
+
+The YouTube miss and the CapEx shock combined to create a negative narrative despite fundamentally strong results. Analysts noted the "invest now, prove later" dynamic was becoming increasingly uncomfortable for investors focused on near-term returns.
+
+Search market share showed slight erosion from AI competitors, with Pichai addressing this directly by noting that Google's AI Overviews feature was actually increasing search engagement and monetization.

@@ -1,7 +1,7 @@
 {
   "event_id": "sample_event",
   "name": "Sample Earnings Call Event",
-  "stimulus_path": "benchmarks/data/sample_stimulus.txt",
+  "stimulus_path": "sample_stimulus.txt",
   "actual_sentiment": {
     "timestamps": [0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
     "scores": [0.0, 0.15, 0.25, 0.20, 0.10, 0.05],

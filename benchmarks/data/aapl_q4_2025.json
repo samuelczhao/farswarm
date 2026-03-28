@@ -1,0 +1,20 @@
+{
+  "event_id": "aapl_q4_2025",
+  "name": "Apple Q1 FY2026 Earnings (Q4 Cal 2025)",
+  "date": "2026-01-30",
+  "stimulus_path": "stimuli/aapl_q4_2025.txt",
+  "beat_or_miss": "beat",
+  "eps_actual": 2.84,
+  "eps_estimated": 2.66,
+  "revenue_actual_b": 143.8,
+  "revenue_estimated_b": 138.0,
+  "stock_reaction_pct": 3.2,
+  "actual_sentiment": {
+    "timestamps": [0.0, 4.0, 8.0, 12.0, 24.0, 48.0, 72.0],
+    "scores": [0.0, 0.45, 0.55, 0.50, 0.40, 0.35, 0.30],
+    "volumes": [50, 800, 1500, 2000, 1200, 600, 300]
+  },
+  "actual_keywords": ["record", "revenue", "beat", "iphone", "services", "growth", "AI", "strong", "earnings", "upgrade"],
+  "actual_engagement_volumes": [50, 800, 1500, 2000, 1200, 600, 300],
+  "dominant_narrative": "Record-breaking quarter with strong iPhone and Services growth. AI optimism without specific product announcements. Bullish consensus."
+}

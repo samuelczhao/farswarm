@@ -1,0 +1,20 @@
+{
+  "event_id": "nvda_q4_2025",
+  "name": "NVIDIA Q4 FY2026 Earnings",
+  "date": "2026-02-25",
+  "stimulus_path": "stimuli/nvda_q4_2025.txt",
+  "beat_or_miss": "beat_strong",
+  "eps_actual": 1.62,
+  "eps_estimated": 1.53,
+  "revenue_actual_b": 68.1,
+  "revenue_estimated_b": 65.91,
+  "stock_reaction_pct": 4.5,
+  "actual_sentiment": {
+    "timestamps": [0.0, 4.0, 8.0, 12.0, 24.0, 48.0, 72.0],
+    "scores": [0.0, 0.60, 0.65, 0.55, 0.50, 0.45, 0.40],
+    "volumes": [80, 1500, 3000, 3500, 2000, 1000, 500]
+  },
+  "actual_keywords": ["AI", "data center", "record", "beat", "guidance", "chips", "Blackwell", "dominant", "growth", "valuation"],
+  "actual_engagement_volumes": [80, 1500, 3000, 3500, 2000, 1000, 500],
+  "dominant_narrative": "Strong AI chip demand continues. Record data center revenue. Guidance above consensus. Market debate on valuation sustainability despite dominance."
+}

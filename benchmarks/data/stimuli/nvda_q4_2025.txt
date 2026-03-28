@@ -1,0 +1,15 @@
+NVIDIA Corporation Q4 Fiscal Year 2026 Earnings Call Summary (February 25, 2026)
+
+NVIDIA delivered another blowout quarter with revenue of $68.1 billion, beating analyst estimates of $65.91 billion. Earnings per share of $1.62 exceeded the $1.53 consensus. Revenue grew approximately 73% year-over-year, maintaining the company's extraordinary growth trajectory.
+
+CEO Jensen Huang opened by emphasizing the insatiable demand for AI computing infrastructure. Data center revenue reached a record $64.2 billion, driven by continued deployment of the Blackwell GPU architecture across hyperscale cloud providers and enterprise customers.
+
+Huang described the current moment as "the beginning of a new computing era" and stated that every major technology company and government is now racing to build AI infrastructure. He highlighted NVIDIA's expanding software ecosystem as a moat, noting that CUDA now has over 5 million developers.
+
+The company provided Q1 FY2027 guidance of $72 billion, above the $69 billion consensus, signaling sustained demand. CFO Colette Kress noted that supply constraints were gradually easing but demand continued to outstrip availability for the most advanced chips.
+
+Gaming revenue was flat year-over-year at $3.2 billion, as the segment took a back seat to the explosive data center growth. Automotive and robotics revenue showed promising growth but remained a small fraction of total sales.
+
+Analysts focused questions on potential demand deceleration, competition from AMD and custom silicon efforts by large customers, and the sustainability of current spending levels by hyperscalers. Huang pushed back firmly, arguing that AI infrastructure spending was still in its early stages.
+
+Some analysts raised concerns about valuation, noting that even with the strong beat, the stock's forward multiple remained elevated. The debate between "generational opportunity" bulls and "peak spending cycle" bears continued to dominate the investment narrative.

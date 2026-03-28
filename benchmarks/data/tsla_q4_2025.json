@@ -1,0 +1,20 @@
+{
+  "event_id": "tsla_q4_2025",
+  "name": "Tesla Q4 2025 Earnings",
+  "date": "2026-01-28",
+  "stimulus_path": "stimuli/tsla_q4_2025.txt",
+  "beat_or_miss": "beat_narrow",
+  "eps_actual": 0.50,
+  "eps_estimated": 0.40,
+  "revenue_actual_b": 24.9,
+  "revenue_estimated_b": 24.5,
+  "stock_reaction_pct": -2.1,
+  "actual_sentiment": {
+    "timestamps": [0.0, 4.0, 8.0, 12.0, 24.0, 48.0, 72.0],
+    "scores": [0.0, 0.15, -0.10, -0.20, -0.15, -0.10, -0.05],
+    "volumes": [100, 2000, 3500, 4000, 2500, 1500, 800]
+  },
+  "actual_keywords": ["deliveries", "decline", "margins", "robotaxi", "competition", "beat", "efficiency", "Musk", "disappointing", "growth"],
+  "actual_engagement_volumes": [100, 2000, 3500, 4000, 2500, 1500, 800],
+  "dominant_narrative": "EPS beat but second consecutive year of declining deliveries. Mixed sentiment: cost efficiency praised but growth trajectory questioned. Polarized between Musk supporters and skeptics."
+}
