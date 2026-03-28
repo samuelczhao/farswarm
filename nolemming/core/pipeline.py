@@ -51,22 +51,18 @@ class NoLemmingPipeline:
         n_archetypes: int | None = None,
         pca_dims: int | None = None,
     ) -> tuple[list[NeuralArchetype], EngagementTemplate]:
-        """Compress neural response and cluster into archetypes."""
+        """Generate population, cluster into archetypes, build engagement template."""
         from nolemming.mapping.archetypes import ArchetypeClusterer
         from nolemming.mapping.brain_atlas import BrainAtlas
-        from nolemming.mapping.compressor import VoxelCompressor
         from nolemming.mapping.engagement import EngagementTemplateBuilder
+        from nolemming.mapping.population import generate_population_responses
 
-        dims = pca_dims or self.config.default_pca_dims
         n_arch = n_archetypes or self.config.default_n_archetypes
 
-        compressor = VoxelCompressor(n_dims=dims)
-        compressor.fit_single(response)
-        compressed = compressor.compress_timesteps(response)
-
         atlas = BrainAtlas()
+        population = generate_population_responses(response, atlas)
         clusterer = ArchetypeClusterer(n_archetypes=n_arch)
-        archetypes = clusterer.cluster(compressed, atlas, response.activations)
+        archetypes = clusterer.cluster_population(population, atlas)
 
         builder = EngagementTemplateBuilder()
         template = builder.build(archetypes, response, atlas)
