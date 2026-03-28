@@ -45,6 +45,8 @@ def compute_sentiment_correlation(
     )
     if len(p_scores) < 3:
         return 0.0
+    if np.std(p_scores) == 0 or np.std(a_scores) == 0:
+        return 0.0
     r, _ = pearsonr(p_scores, a_scores)
     return float(r) if np.isfinite(r) else 0.0
 

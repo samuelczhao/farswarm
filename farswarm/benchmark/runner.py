@@ -60,12 +60,38 @@ class BenchmarkResult:
 async def _run_simulation(
     config: SimulationConfig,
 ) -> SimulationResult:
-    """Run a simulation with the given config. Placeholder for integration."""
-    msg = (
-        "Simulation runner not yet integrated. "
-        "Pass SimulationResult directly for now."
+    """Run a full simulation pipeline for a benchmark condition."""
+    from farswarm.agents.factory import AgentFactory
+    from farswarm.encoders.registry import encoder_registry
+    from farswarm.mapping.archetypes import ArchetypeClusterer
+    from farswarm.mapping.brain_atlas import BrainAtlas
+    from farswarm.mapping.compressor import VoxelCompressor
+    from farswarm.mapping.engagement import EngagementTemplateBuilder
+    from farswarm.simulation.engine import SimulationEngine
+
+    encoder = encoder_registry.get(config.encoder_name)
+    response = encoder.encode(config.stimulus)
+
+    compressor = VoxelCompressor(n_dims=config.pca_dims)
+    compressor.fit_single(response)
+    compressed = compressor.compress_timesteps(response)
+
+    atlas = BrainAtlas()
+    archetypes = ArchetypeClusterer(
+        n_archetypes=config.n_archetypes,
+    ).cluster(compressed, atlas, response.activations)
+
+    template = EngagementTemplateBuilder().build(
+        archetypes, response, atlas,
     )
-    raise NotImplementedError(msg)
+
+    agents = AgentFactory(
+        archetypes=archetypes, seed=config.seed,
+    ).generate_population(config.n_agents)
+
+    engine = SimulationEngine(config=config)
+    await engine.setup(agents, template)
+    return await engine.run()
 
 
 def _evaluate_condition(
@@ -99,7 +125,7 @@ class BenchmarkRunner:
     """Runs benchmark comparisons across multiple conditions and events."""
 
     def __init__(self, data_dir: Path) -> None:
-        self._loader = GroundTruthLoader(data_dir)
+        self.loader = GroundTruthLoader(data_dir)
 
     async def run_event(
         self,
@@ -111,7 +137,7 @@ class BenchmarkRunner:
         for condition in conditions:
             sim_result = await _run_simulation(condition.config)
             metrics = _evaluate_condition(
-                sim_result, event_id, self._loader,
+                sim_result, event_id, self.loader,
             )
             result.conditions[condition.name] = metrics
         return result
@@ -121,7 +147,7 @@ class BenchmarkRunner:
         conditions: list[BenchmarkCondition],
     ) -> list[BenchmarkResult]:
         """Run all events with all conditions."""
-        events = self._loader.list_events()
+        events = self.loader.list_events()
         results: list[BenchmarkResult] = []
         for event_id in events:
             bench_result = await self.run_event(event_id, conditions)
