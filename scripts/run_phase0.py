@@ -39,7 +39,7 @@ from nolemming.mapping.engagement import EngagementTemplateBuilder
 from nolemming.simulation.engine import SimulationEngine
 
 N_AGENTS = 15
-N_ROUNDS = 3
+N_ROUNDS = 7
 N_ARCHETYPES = 5
 PCA_DIMS = 32
 LLM_MODEL = "qwen2.5:3b"
