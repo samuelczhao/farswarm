@@ -176,16 +176,16 @@ export NOLEMMING_ENCODER_NAME=mock
 
 | Event | Neural | Vanilla | Random | Winner |
 |-------|--------|---------|--------|--------|
-| AAPL | +0.034 | **+0.653** | +0.034 | vanilla |
-| GOOGL | **-0.544** | -0.679 | -0.976 | neural |
-| META | **+0.575** | -0.958 | +0.000 | neural |
-| NVDA | -0.768 | +0.000 | **+0.137** | random |
-| TSLA | **+0.078** | +0.000 | -0.533 | neural |
-| **Wins** | **3/5** | 1/5 | 1/5 | |
+| AAPL | **-0.603** | -0.933 | -0.847 | neural |
+| GOOGL | +0.009 | **+0.865** | -0.634 | vanilla |
+| META | +0.256 | -0.647 | **+0.653** | random |
+| NVDA | **+0.971** | +0.611 | +0.552 | neural |
+| TSLA | -0.409 | **+0.566** | +0.247 | vanilla |
+| **Wins** | **2/5** | **2/5** | 1/5 | |
 
-Standout: META earnings — neural agents tracked real sentiment direction (+0.575) while vanilla agents predicted the exact opposite (-0.958).
+Standout: NVDA earnings — neural agents achieved +0.971 correlation with actual sentiment trajectory. Overall, neural outperforms random (2 vs 1 win) and ties vanilla.
 
-Run with Ollama/qwen2.5:3b (3B params, runs on CPU). Better LLM = better results.
+Run with Ollama/qwen2.5:3b (3B params, CPU-only, 2018 Mac). Better LLM + real brain encoder (TRIBE v2) = better results.
 
 ```bash
 # Run the benchmark yourself
