@@ -82,8 +82,13 @@ def _scale_engagement(raw: float) -> float:
 
 
 def _compute_decay(stimulus_response: NeuralResponse) -> float:
-    """Higher stimulus intensity → slower decay (lower value)."""
+    """Higher stimulus intensity → slower decay (lower positive value).
+
+    Decay must always be positive so that higher content similarity
+    produces higher engagement (not inverted).
+    """
     intensity = float(np.mean(np.abs(stimulus_response.mean_activation())))
     max_intensity = float(np.max(np.abs(stimulus_response.mean_activation())))
     normalized = intensity / max_intensity if max_intensity > 0 else 0.5
-    return float(BASE_DECAY - normalized * INTENSITY_DECAY_SCALE)
+    decay = BASE_DECAY - normalized * INTENSITY_DECAY_SCALE
+    return float(max(decay, 0.1))

@@ -157,23 +157,27 @@ class TwitterPlatform(SimulationPlatform):
         recent = self._posts[-5:] if self._posts else ["(no posts yet)"]
         recent_str = "\n".join(f"- {p[:100]}" for p in recent)
 
+        persona_hint = agent.persona[:200] if agent.persona else ""
+
         response = await self._llm.generate(  # type: ignore[union-attr]
             system_prompt=(
                 f"You are {agent.name} (@{agent.username}). "
-                f"Cognitive profile: {agent.archetype.label} — {agent.archetype.description} "
-                f"Your stance: {agent.stance}. "
+                f"Cognitive profile: {agent.archetype.label} — "
+                f"{agent.archetype.description} "
+                f"{persona_hint} "
                 "Write a single short social media post (1-2 sentences, max 200 chars). "
-                "Be opinionated. React to the topic and recent discussion."
+                "Be opinionated and specific. React to the topic."
             ),
             user_prompt=(
-                f"Topic: {self._stimulus_context}\n\n"
-                f"Recent posts in your feed:\n{recent_str}\n\n"
-                "Write your post:"
+                f"Topic:\n{self._stimulus_context[:300]}\n\n"
+                f"Recent posts:\n{recent_str}\n\n"
+                "Your post:"
             ),
             temperature=0.9,
             max_tokens=100,
         )
-        return response.content.strip()[:280]
+        content = response.content.strip()[:280]
+        return content if content else f"[{agent.username}] ..."
 
     def _step_fallback(
         self, active_agents: list[AgentProfile],

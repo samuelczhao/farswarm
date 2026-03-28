@@ -21,7 +21,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from nolemming.agents.factory import AgentFactory
-from nolemming.analysis.networks import NetworkAnalyzer
 from nolemming.analysis.sentiment import SentimentAnalyzer
 from nolemming.analysis.signals import SignalExtractor
 from nolemming.benchmark.ground_truth import GroundTruthLoader
@@ -56,6 +55,7 @@ async def run_condition(
     stimulus: Stimulus,
     seed: int,
     shuffle_archetypes: bool = False,
+    use_uniform_activity: bool = False,
 ) -> dict:
     """Run a single benchmark condition."""
     print(f"    [{name}] Encoding stimulus...")
@@ -78,6 +78,9 @@ async def run_condition(
     if shuffle_archetypes:
         agents = _shuffle_archetype_assignments(agents, archetypes, seed)
 
+    if use_uniform_activity:
+        agents = _set_uniform_activity(agents)
+
     config = SimulationConfig(
         stimulus=stimulus,
         n_agents=N_AGENTS,
@@ -95,9 +98,6 @@ async def run_condition(
             model=LLM_MODEL, base_url=LLM_BASE_URL,
         )
 
-    # Read stimulus text for context
-    stimulus_text = stimulus.path.read_text(encoding="utf-8")[:500]
-
     print(f"    [{name}] Running simulation ({N_AGENTS} agents, {N_ROUNDS} rounds)...")
     engine = SimulationEngine(config=config, llm=llm)
     await engine.setup(agents, template)
@@ -112,6 +112,23 @@ async def run_condition(
         "trajectory": trajectory,
         "signals": signals,
     }
+
+
+def _set_uniform_activity(agents: list[AgentProfile]) -> list[AgentProfile]:
+    """Set all agents to the same activity level (removes engagement modulation effect)."""
+    return [
+        AgentProfile(
+            agent_id=a.agent_id,
+            archetype=a.archetype,
+            name=a.name,
+            username=a.username,
+            bio=a.bio,
+            persona=a.persona,
+            activity_level=0.3,  # uniform baseline
+            stance=a.stance,
+        )
+        for a in agents
+    ]
 
 
 def _shuffle_archetype_assignments(
@@ -147,12 +164,13 @@ async def benchmark_event(event_id: str, loader: GroundTruthLoader) -> dict:
 
     conditions = {}
     for name, seed, shuffle in [
-        ("neural", 42, False),
-        ("vanilla", 99, False),
-        ("random", 42, True),
+        ("neural", 42, False),     # Neural archetypes + engagement template
+        ("vanilla", 42, False),    # Same archetypes but uniform activity (no engagement modulation)
+        ("random", 42, True),      # Same encoding but shuffled archetype assignments
     ]:
         start = time.time()
-        data = await run_condition(name, stimulus, seed, shuffle)
+        use_uniform = (name == "vanilla")
+        data = await run_condition(name, stimulus, seed, shuffle, use_uniform)
         elapsed = time.time() - start
         print(f"    [{name}] Done in {elapsed:.1f}s")
 
@@ -183,7 +201,7 @@ async def main() -> None:
     print("=" * 60)
     print(f"Config: {N_AGENTS} agents, {N_ROUNDS} rounds, {N_ARCHETYPES} archetypes")
     print(f"LLM: {LLM_MODEL} via {LLM_BASE_URL}")
-    print(f"Events: 5 earnings calls (AAPL, TSLA, NVDA, META, GOOGL)")
+    print("Events: 5 earnings calls (AAPL, TSLA, NVDA, META, GOOGL)")
 
     loader = GroundTruthLoader(data_dir=DATA_DIR)
     events = [e for e in loader.list_events() if e != "sample_event"]

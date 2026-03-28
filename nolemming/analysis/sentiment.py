@@ -9,13 +9,23 @@ from dataclasses import dataclass, field
 from nolemming.core.types import SimulationResult
 
 POSITIVE_WORDS: set[str] = {
-    "bullish", "great", "amazing", "growth", "beat",
-    "outperform", "upgrade", "buy", "strong", "excellent",
+    "bullish", "great", "amazing", "growth", "beat", "outperform", "upgrade",
+    "buy", "strong", "excellent", "positive", "optimistic", "impressive",
+    "record", "surge", "soar", "rally", "boom", "profit", "gains",
+    "upside", "momentum", "confident", "promising", "robust", "thriving",
+    "breakthrough", "innovation", "opportunity", "exceeded", "fantastic",
+    "solid", "healthy", "accelerating", "dominance", "winning", "bullrun",
+    "moon", "rocket", "calls", "long", "overweight", "accumulate",
 }
 
 NEGATIVE_WORDS: set[str] = {
-    "bearish", "terrible", "crash", "miss", "underperform",
-    "downgrade", "sell", "weak", "disappointing", "decline",
+    "bearish", "terrible", "crash", "miss", "underperform", "downgrade",
+    "sell", "weak", "disappointing", "decline", "negative", "pessimistic",
+    "concerning", "loss", "drop", "plunge", "dump", "bust", "risk",
+    "losses", "downside", "uncertainty", "worried", "struggling", "failing",
+    "collapse", "bubble", "overvalued", "expensive", "puts", "short",
+    "underweight", "avoid", "fear", "panic", "recession", "threat",
+    "warning", "skeptical", "doubt", "alarming", "stagnant", "falling",
 }
 
 
@@ -47,12 +57,15 @@ def _score_text(text: str) -> float:
 def _load_posts_by_round(db_path: str) -> dict[int, list[str]]:
     """Load post content grouped by round from the simulation DB."""
     posts: dict[int, list[str]] = defaultdict(list)
-    with sqlite3.connect(db_path) as conn:
-        cursor = conn.execute(
-            "SELECT round, content FROM posts ORDER BY round"
-        )
-        for round_num, content in cursor:
-            posts[round_num].append(content)
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.execute(
+                "SELECT round, content FROM posts ORDER BY round"
+            )
+            for round_num, content in cursor:
+                posts[round_num].append(content)
+    except sqlite3.OperationalError:
+        pass
     return dict(posts)
 
 
