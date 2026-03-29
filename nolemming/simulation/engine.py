@@ -83,13 +83,27 @@ class SimulationEngine:
             logger.info("Round %d/%d: %d active agents", round_num, total, len(active))
 
     def _get_active_agents(self, round_num: int) -> list[AgentProfile]:
-        """Select active agents using engagement template modulation."""
+        """Select active agents using engagement template modulation.
+
+        Guarantees at least MIN_ACTIVE agents per round for meaningful simulation.
+        """
         content_sim = self._estimate_content_similarity()
+        scored: list[tuple[float, AgentProfile]] = []
         active: list[AgentProfile] = []
         for agent in self._agents:
             prob = self._dynamics.modulate_activation(agent, content_sim)  # type: ignore[union-attr]
             if self._rng.random() < prob:
                 active.append(agent)
+            scored.append((prob, agent))
+
+        min_active = max(3, len(self._agents) // 10)
+        if len(active) < min_active:
+            scored.sort(key=lambda x: -x[0])
+            for prob, agent in scored:
+                if agent not in active:
+                    active.append(agent)
+                if len(active) >= min_active:
+                    break
         return active
 
     def _estimate_content_similarity(self) -> float:

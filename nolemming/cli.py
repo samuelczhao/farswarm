@@ -192,9 +192,13 @@ def demo() -> None:
     from nolemming.simulation.engine import SimulationEngine
 
     sample_text = (
-        "Company X reports Q4 earnings. Revenue of $25B beats estimates of $24B. "
-        "EPS of $2.18 vs expected $1.95. Raised full-year guidance citing strong "
-        "demand. 35% YoY cloud growth. $10B share buyback announced."
+        "Company X reports Q4 earnings beat: revenue $25B vs $24B estimated. "
+        "EPS $2.18 vs $1.95 expected. However, CEO announced controversial "
+        "$50B AI spending plan, alarming investors despite record growth. "
+        "Analysts skeptical of the spending risk. Stock dropped 5% despite "
+        "the beat. Community divided between bulls seeing opportunity and "
+        "bears warning of an expensive bubble. Guidance raised but capex "
+        "concerns overshadow strong fundamentals."
     )
 
     with tempfile.NamedTemporaryFile(suffix=".txt", mode="w", delete=False) as f:
@@ -222,11 +226,11 @@ def demo() -> None:
         console.print(f"     {a.label} ({a.population_fraction:.0%}) — {a.dominant_regions[:2]}")
 
     console.print("[dim]3. Generating agent population...[/dim]")
-    agents = AgentFactory(archetypes=archetypes, seed=42).generate_population(30)
+    agents = AgentFactory(archetypes=archetypes, seed=42).generate_population(120)
     console.print(f"   {len(agents)} agents created")
 
-    console.print("[dim]4. Running social simulation (3 rounds)...[/dim]")
-    config = SimulationConfig(stimulus=stimulus, n_agents=30, n_rounds=3)
+    console.print("[dim]4. Running social simulation (20 rounds)...[/dim]")
+    config = SimulationConfig(stimulus=stimulus, n_agents=120, n_rounds=20)
     engine = SimulationEngine(config=config)
     _run_async(engine.setup(agents, template))
     sim_result = _run_async(engine.run())
@@ -247,24 +251,21 @@ def demo() -> None:
     ))
 
     # Generate visualization
-    from nolemming.viz.dashboard import generate_dashboard
-    from nolemming.viz.swarm import generate_swarm_viz
+    from nolemming.viz.neural import generate_neural_viz
 
     output_dir = Path("./output/demo")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    dash_html = generate_dashboard(sim_result, response, trajectory, signals)
-    (output_dir / "dashboard.html").write_text(dash_html)
+    viz_html = generate_neural_viz(sim_result, response, trajectory, signals)
+    viz_path = output_dir / "neural.html"
+    viz_path.write_text(viz_html)
 
-    swarm_html = generate_swarm_viz(sim_result)
-    (output_dir / "swarm.html").write_text(swarm_html)
-
-    console.print("\n[bold green]Visualizations saved:[/bold green]")
-    console.print(f"  Dashboard: {output_dir / 'dashboard.html'}")
-    console.print(f"  Swarm:     {output_dir / 'swarm.html'}")
-    console.print("[dim]Open in browser to see interactive visualizations.[/dim]")
+    console.print(f"\n[bold green]Visualization:[/bold green] {viz_path}")
+    console.print("[dim]Opening in browser...[/dim]")
 
     import os
+    import webbrowser
+    webbrowser.open(f"file://{viz_path.resolve()}")
     os.unlink(stim_path)
 
 
