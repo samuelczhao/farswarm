@@ -232,7 +232,7 @@ def demo() -> None:
     sim_result = _run_async(engine.run())
 
     console.print("[dim]5. Analyzing results...[/dim]")
-    _ = SentimentAnalyzer().extract_trajectory(sim_result)
+    trajectory = SentimentAnalyzer().extract_trajectory(sim_result)
     signals = SignalExtractor().extract(sim_result)
 
     console.print()
@@ -246,9 +246,26 @@ def demo() -> None:
         border_style="green",
     ))
 
+    # Generate visualization
+    from nolemming.viz.dashboard import generate_dashboard
+    from nolemming.viz.swarm import generate_swarm_viz
+
+    output_dir = Path("./output/demo")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    dash_html = generate_dashboard(sim_result, response, trajectory, signals)
+    (output_dir / "dashboard.html").write_text(dash_html)
+
+    swarm_html = generate_swarm_viz(sim_result)
+    (output_dir / "swarm.html").write_text(swarm_html)
+
+    console.print("\n[bold green]Visualizations saved:[/bold green]")
+    console.print(f"  Dashboard: {output_dir / 'dashboard.html'}")
+    console.print(f"  Swarm:     {output_dir / 'swarm.html'}")
+    console.print("[dim]Open in browser to see interactive visualizations.[/dim]")
+
     import os
     os.unlink(stim_path)
-    console.print("\n[dim]Done. Run 'nolemming run <file>' for a full simulation.[/dim]")
 
 
 @app.command()

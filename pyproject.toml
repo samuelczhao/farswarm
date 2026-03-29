@@ -73,6 +73,9 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
 
+[tool.ruff.lint.per-file-ignores]
+"nolemming/viz/*.py" = ["E501"]
+
 [tool.mypy]
 python_version = "3.11"
 strict = true
