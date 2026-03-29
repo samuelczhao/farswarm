@@ -207,6 +207,10 @@ def demo() -> None:
 
     stimulus = Stimulus.from_path(stim_path)
 
+    console.print(
+        "[dim yellow]Note: Using mock encoder (synthetic neural data). "
+        "For real brain encoding, use --encoder tribe_v2 or precomputed.[/dim yellow]"
+    )
     console.print("[dim]1. Encoding stimulus with brain encoder...[/dim]")
     response = MockEncoder(seed=42).encode(stimulus)
     console.print(f"   Neural response: {response.activations.shape}")

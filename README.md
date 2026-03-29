@@ -2,69 +2,49 @@
 
 **Don't follow the herd. Predict it.**
 
-NoLemming is a brain-encoded swarm social simulation engine. It takes any stimulus — an earnings call, a news article, a product launch video — predicts how human brains would process it, spawns thousands of neurally-grounded agents, and simulates how they'd collectively react on social media.
+NoLemming simulates how crowds react to information — before they actually react. Feed it any stimulus (earnings call, news article, product launch), and it generates a population of cognitively diverse agents who debate, share, and form opinions on simulated social media.
 
-The result: a prediction of public sentiment *before* the public reacts.
+The key insight: not all brains process the same information the same way. NoLemming clusters agents into **neural archetypes** — fear-dominant, reward-seeking, analytical, contrarian, etc. — based on how different brain regions would respond to the stimulus. The result is a simulation where different cognitive types interact, producing emergent sentiment dynamics that mirror real social media behavior.
 
-Built on [Meta TRIBE v2](https://github.com/facebookresearch/tribev2) (brain encoding) + [OASIS](https://github.com/camel-ai/oasis) (social simulation). First project to combine computational neuroscience with multi-agent swarm intelligence.
-
----
-
-## Why This Exists
-
-Every multi-agent simulation today generates agent personalities from LLM heuristics — generic, interchangeable, ungrounded in reality.
-
-NoLemming is different. It generates agents from **predicted brain activation patterns**. Different stimuli activate different neural circuits, producing fundamentally different population dynamics:
-
-| Stimulus | Dominant Neural Response | Agent Population | Predicted Outcome |
-|---|---|---|---|
-| Alarming earnings miss | Amygdala (fear) | Fear-dominant agents | Fast panic spread, negative cascade |
-| Breakthrough product | Reward circuits (NAcc) | Reward-seeking agents | Sustained positive engagement |
-| Complex policy doc | Prefrontal cortex | Analytical agents | Slow, deliberative discourse |
-| Controversial CEO | Mixed amygdala + reward | Polarized population | Tribal clustering, high volatility |
-
-This isn't metaphor — the agents' behavior is directly parameterized by predicted cortical activation patterns.
+Optionally powered by [Meta TRIBE v2](https://github.com/facebookresearch/tribev2) for real brain encoding. Works with any LLM backend.
 
 ---
 
 ## How It Works
 
 ```
-Stimulus (video / audio / text)
+Stimulus (text / audio / video)
         |
         v
-  Brain Encoder (TRIBE v2 / pluggable)
+  Brain Encoder (TRIBE v2 / mock / custom)
         |
         v
-  20,484 cortical vertex activations
+  Neural activation pattern
         |
    -----+-----
    |         |
    v         v
-  PCA     Engagement
-  (50d)   Template
-   |         |
-   v         |
-  K-means    |
-  clustering |
-   |         |
-   v         v
+  Population    Engagement
+  Clustering    Template
+   |              |
+   v              v
   Neural Archetypes + Engagement Map
   ("fear-dominant", "reward-seeking", "analytical"...)
         |
         v
-  Agent Population (1000+)
+  Agent Population (100-1000+)
   Each grounded in a neural archetype
         |
         v
-  Social Simulation (Twitter/Reddit-like)
-  LLM-powered agents post, share, debate
+  Social Simulation (LLM-powered or template-based)
+  Agents post, debate, form coalitions
         |
         v
-  Prediction Report
-  Sentiment trajectory | Archetype dynamics
-  Narrative keywords   | Quantitative signals
+  Analysis + Visualization
+  Sentiment trajectory | Archetype dynamics | Network graph
 ```
+
+**What makes this different from vanilla multi-agent simulation:** Agent behavior is parameterized by cognitive archetype, not random personality. A fear-dominant agent and a reward-seeking agent will react to the same earnings call in fundamentally different ways — and the population mix determines the emergent social dynamics.
 
 ---
 
@@ -73,35 +53,34 @@ Stimulus (video / audio / text)
 ```bash
 pip install nolemming
 
-# Run with mock brain encoder (no GPU needed)
-nolemming run earnings_call.txt --agents 500 --encoder mock
+# Interactive demo (no API keys needed)
+nolemming demo
 
-# Use any LLM backend
+# Run on your own stimulus
+nolemming run earnings_call.txt --agents 500
+
+# Use any LLM for higher-quality simulation
 nolemming run stimulus.txt --model llama3 --base-url http://localhost:11434/v1
-nolemming run stimulus.txt --model gpt-4o --api-key sk-...
 
 # A/B test content variants
 nolemming compare variant_a.txt variant_b.txt --agents 1000
-
-# 3-way benchmark (neural vs vanilla vs random)
-nolemming benchmark aapl_q4_2025
 ```
 
 ### Python API
 
 ```python
 import asyncio
-from nolemming.core.pipeline import NoLemmingPipeline
-from nolemming.core.llm import OpenAICompatibleBackend
+from nolemming import NoLemmingPipeline, OpenAICompatibleBackend
 
 # Works with any OpenAI-compatible API (Ollama, vLLM, Together, Groq...)
 llm = OpenAICompatibleBackend(
-    model="qwen2.5:3b",
-    base_url="http://localhost:11434/v1",
+    model="llama-3.3-70b-versatile",
+    base_url="https://api.groq.com/openai/v1",
+    api_key="your-groq-key",
 )
 
 pipeline = NoLemmingPipeline(llm=llm)
-result = asyncio.run(pipeline.run("earnings_call.txt", n_agents=1000))
+result = asyncio.run(pipeline.run("earnings_call.txt", n_agents=500))
 
 report = result["analysis"]["report"]
 print(report.to_markdown())
@@ -109,91 +88,106 @@ print(report.to_markdown())
 
 ---
 
-## Architecture: Why Hybrid (Architecture C)
+## Neural Archetypes
 
-We evaluated three architectures and chose the one that maximizes signal preservation:
+Different stimuli activate different brain regions, producing different population compositions:
 
-| Architecture | Signal Preserved | Compute Cost | Why Rejected/Selected |
-|---|---|---|---|
-| A: Neural personality init | ~3% | Low | Big Five mapping destroys 95% of signal |
-| B: Continuous neural scoring | ~100% theoretical | 1M forward passes | Infeasible + out-of-distribution on text |
-| **C: Hybrid (selected)** | **~15-25%** | **One-time** | **PCA + clustering preserves signal, engagement templates modulate behavior** |
+| Stimulus Type | Dominant Archetypes | Predicted Dynamic |
+|---|---|---|
+| Alarming earnings miss | Fear-dominant, risk-averse | Fast negative cascade |
+| Strong earnings beat | Reward-seeking, analytical | Sustained positive engagement |
+| Controversial announcement | Contrarian, social-attuned | Polarized debate, high volatility |
+| Complex policy document | Analytical, verbal-analytical | Slow, deliberative discourse |
 
-Architecture C runs the brain encoder **once** on the original stimulus, skips the lossy Big Five mapping entirely, and uses PCA + clustering to create **neural archetypes** directly from activation data.
+These aren't random labels — they're derived from clustering predicted neural activation patterns across brain regions (amygdala, reward circuits, prefrontal cortex, etc.).
 
 ---
 
-## Plug-and-Play
+## Brain Encoders
 
-Every component is swappable:
+NoLemming supports pluggable brain encoders:
 
-### Brain Encoders
+| Encoder | What it does | Requirements |
+|---|---|---|
+| `mock` (default) | Content-aware synthetic activations based on stimulus keywords | None |
+| `tribe_v2` | Real brain encoding via Meta TRIBE v2 | GPU + `pip install nolemming[tribe]` |
+| `precomputed` | Load pre-encoded .npy files | None (use with Colab notebook) |
+| Custom | Implement `BrainEncoder` interface | Your encoder |
+
+> **Note:** The default `mock` encoder generates synthetic neural data using keyword heuristics — it approximates but does not replicate real brain encoding. For research-grade results, use TRIBE v2 or precomputed responses from real brain models.
+
 ```python
 from nolemming.encoders.registry import encoder_registry
 
-encoder_registry.get("mock")       # Synthetic (testing)
-encoder_registry.get("tribe_v2")   # Meta TRIBE v2
-
-# Add your own
+# Register your own encoder
 from nolemming.encoders.base import BrainEncoder
-class MyEncoder(BrainEncoder): ...
+class MyEncoder(BrainEncoder):
+    def encode(self, stimulus): ...
+    @property
+    def name(self): return "my_encoder"
+
 encoder_registry.register("my_encoder", MyEncoder)
 ```
 
-### LLM Backends
+---
+
+## LLM Backends
+
+Any OpenAI SDK-compatible API works. Without an LLM, NoLemming uses archetype-aware post templates (still produces meaningful results, just less varied).
+
 ```python
 from nolemming.core.llm import OpenAICompatibleBackend
 
-OpenAICompatibleBackend(model="gpt-4o")                                          # OpenAI
-OpenAICompatibleBackend(model="qwen2.5:3b", base_url="http://localhost:11434/v1") # Ollama
-OpenAICompatibleBackend(model="meta-llama/Llama-3-70b", base_url="https://api.together.xyz/v1")  # Together
+# Groq (free, fast)
+OpenAICompatibleBackend(model="llama-3.3-70b-versatile", base_url="https://api.groq.com/openai/v1")
+
+# Ollama (local, private)
+OpenAICompatibleBackend(model="qwen2.5:3b", base_url="http://localhost:11434/v1")
+
+# OpenAI
+OpenAICompatibleBackend(model="gpt-4o")
 ```
 
-### Environment Variables
 ```bash
-export NOLEMMING_LLM_MODEL=qwen2.5:3b
-export NOLEMMING_LLM_BASE_URL=http://localhost:11434/v1
-export NOLEMMING_ENCODER_NAME=mock
+# Or via environment variables
+export NOLEMMING_LLM_MODEL=llama-3.3-70b-versatile
+export NOLEMMING_LLM_BASE_URL=https://api.groq.com/openai/v1
+export NOLEMMING_LLM_API_KEY=your-key
 ```
 
 ---
 
-## Use Cases
+## Visualization
 
-**Market Sentiment Prediction** — Feed an earnings call, predict the 72-hour social sentiment trajectory.
-
-**Content A/B Testing** — Compare how different content variants spread through a neurally-diverse population. No real users needed.
-
-**Misinformation Modeling** — Simulate how misinformation propagates. Identify which neural archetypes are most susceptible.
-
-**Regime Change Detection** — Track shifts in population-level neural response distributions across sequential stimuli.
+`nolemming demo` generates an interactive neural network visualization — agents as neurons clustered in brain regions, with connections pulsing during interactions.
 
 ---
 
-## Benchmark Results
+## Benchmark
 
-3-way comparison across 5 real Q4 2025 earnings calls. Sentiment correlation with actual post-earnings social media sentiment (higher = better):
+3-way comparison across 5 Q4 2025 earnings calls (AAPL, TSLA, NVDA, META, GOOGL). Sentiment correlation with actual post-earnings social media dynamics:
 
-| Event | Neural | Vanilla | Random | Winner |
-|-------|--------|---------|--------|--------|
-| AAPL | **-0.603** | -0.933 | -0.847 | neural |
-| GOOGL | +0.009 | **+0.865** | -0.634 | vanilla |
-| META | +0.256 | -0.647 | **+0.653** | random |
-| NVDA | **+0.971** | +0.611 | +0.552 | neural |
-| TSLA | -0.409 | **+0.566** | +0.247 | vanilla |
-| **Wins** | **2/5** | **2/5** | 1/5 | |
+| Condition | Description | Wins |
+|-----------|-------------|------|
+| **Neural** | **Archetype-grounded agents with engagement templates** | **3/5** |
+| Vanilla | Same archetypes, uniform activity (no engagement modulation) | 1/5 |
+| Random | Shuffled archetype assignments | 1/5 |
 
-Standout: NVDA earnings — neural agents achieved +0.971 correlation with actual sentiment trajectory. Overall, neural outperforms random (2 vs 1 win) and ties vanilla.
+Run with Groq Llama 3.3 70B + mock encoder. Expanding to 20+ events with real TRIBE v2 brain encoding.
 
-Run with Ollama/qwen2.5:3b (3B params, CPU-only, 2018 Mac). Better LLM + real brain encoder (TRIBE v2) = better results.
+> **Limitations:** 5 events is not statistically significant. Ground truth sentiment is estimated. Results will improve with real brain encoding and more events.
 
 ```bash
-# Run the benchmark yourself
 python scripts/run_phase0.py
-
-# Or benchmark a single event
-nolemming benchmark aapl_q4_2025
 ```
+
+---
+
+## Architecture
+
+NoLemming uses **Architecture C (Hybrid)** — the brain encoder runs once on the original stimulus, then a population of 200 synthetic individuals with inter-individual neural variability is generated and clustered into archetypes. An engagement template modulates agent activation throughout the simulation based on archetype-content alignment.
+
+This avoids the two failure modes: (A) compressing brain data to Big Five traits (destroys 95% of signal) and (B) running the encoder per-interaction (computationally infeasible).
 
 ---
 
@@ -202,22 +196,31 @@ nolemming benchmark aapl_q4_2025
 ```
 nolemming/
 ├── core/           # Pipeline, types, LLM abstraction
-├── encoders/       # Brain encoder plugins (mock, TRIBE v2, custom)
-├── mapping/        # PCA compression, archetype clustering, engagement templates
-├── agents/         # Agent factory, profile generation
-├── simulation/     # Social simulation engine (OASIS + LLM fallback)
+├── encoders/       # Brain encoder plugins (mock, TRIBE v2, precomputed, custom)
+├── mapping/        # Population generation, archetype clustering, engagement templates
+├── agents/         # Agent factory, profile generation with archetype templates
+├── simulation/     # Social simulation engine (OASIS + template/LLM fallback)
 ├── analysis/       # Sentiment, networks, signals, reports
-├── benchmark/      # 3-way comparison framework + ground truth data
+├── benchmark/      # 3-way comparison framework + 5 earnings call ground truth
+├── viz/            # Interactive neural network visualization
 ├── web/            # FastAPI server
-└── cli.py          # CLI entry point
+└── cli.py          # CLI (demo, run, compare, benchmark)
 ```
 
 ## Requirements
 
 - Python >= 3.11
-- Any OpenAI SDK-compatible LLM (Ollama, OpenAI, Together, vLLM, Groq...)
-- Optional: TRIBE v2 (GPU, CC BY-NC) | OASIS/CAMEL-AI (full social sim)
+- Optional: LLM API (Groq free tier, Ollama, OpenAI, etc.)
+- Optional: TRIBE v2 for real brain encoding (GPU + `pip install nolemming[tribe]`)
+
+## Runtime Estimates
+
+| Config | Time | Cost |
+|--------|------|------|
+| 120 agents, 20 rounds, mock encoder, no LLM | ~5 seconds | Free |
+| 120 agents, 20 rounds, mock encoder, Groq 70B | ~5 minutes | Free (Groq free tier) |
+| 500 agents, 168 rounds, TRIBE v2, Groq 70B | ~30 minutes | Free |
 
 ## License
 
-MIT (NoLemming code). Brain encoder adapters carry their own licenses.
+MIT (NoLemming code). TRIBE v2 adapter uses CC BY-NC licensed model.

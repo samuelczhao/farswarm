@@ -53,7 +53,9 @@ def main() -> None:
             np.save(out_path, preds.astype(np.float32))
             print(f"    Saved: {out_path}")
         except Exception as e:
+            import traceback
             print(f"    ERROR: {e}")
+            traceback.print_exc()
 
     print(f"\nDone. Files in {OUTPUT_DIR}/")
 
